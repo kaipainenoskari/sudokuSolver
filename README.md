@@ -2,15 +2,6 @@
 
 This is a Sudoku Solver project that aims to solve Sudoku puzzles programmatically.
 
-## Table of Contents
-
-- [Introduction](#introduction)
-- [Features](#features)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Contributing](#contributing)
-- [License](#license)
-
 ## Introduction
 
 In this project, we have implemented an algorithm to solve Sudoku puzzles. The solver takes an incomplete Sudoku puzzle as input and returns the solved puzzle as output.
