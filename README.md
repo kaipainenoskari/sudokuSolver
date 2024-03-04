@@ -36,8 +36,13 @@ To use the Sudoku Solver, you need to have Python installed on your system. You 
 
 ## Usage
 
-To solve a Sudoku puzzle, run the following command:
+To solve a Sudoku puzzle, run either of the following commands:
 
+Text-based UI
 ```bash
 python main.py
+```
+Graphical UI
+```bash
+python gui.py
 ```
