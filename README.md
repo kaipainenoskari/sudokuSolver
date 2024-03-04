@@ -44,5 +44,5 @@ python main.py
 ```
 Graphical UI
 ```bash
-python gui.py
+python mainGUI.py
 ```

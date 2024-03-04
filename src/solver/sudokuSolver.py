@@ -3,9 +3,14 @@ from solver.sudokuSolver_io import sudokuSolver_io
 # Description: This file contains the code for the sudoku solver. It uses a backtracking algorithm to solve the puzzle.
 class SudokuSolver:
 
-    def __init__(self, io=sudokuSolver_io):
+    def __init__(self, io=sudokuSolver_io, gui=False, tk=None, show=False):
         self.io = io
-        self.board = self.create_board()
+        if gui:
+            self.tk = tk
+            self.show = show
+            self.create_board_with_gui()
+        else:
+            self.board = self.create_board()
 
     def create_board(self):
         # Example board
@@ -16,8 +21,42 @@ class SudokuSolver:
             row = list(map(int, self.io.read(f"Enter row {i + 1}: ")))
             board.append(row)
         return board
+    
+    def create_board_with_gui(self):
+        # Create the main window
+        self.root = self.tk.Tk()
+
+        # Create a 9x9 grid of Entry widgets for input
+        self.entries = [[self.tk.Entry(self.root, width=2) for j in range(9)] for i in range(9)]
+        for i in range(9):
+            for j in range(9):
+                self.entries[i][j].grid(row=i, column=j)
+        
+        # Button to solve the board
+        solve_button = self.tk.Button(self.root, text="Solve", command=self.solve_board)
+        solve_button.grid(row=9, column=0, columnspan=9)
+
+    # Function to collect the current state of the board
+    def get_board(self):
+        return [[int(self.entries[i][j].get()) if self.entries[i][j].get() != "" else 0 for j in range(9)] for i in range(9)]
+    
+    # Function to solve the board
+    def solve_board(self):
+        self.board = self.get_board()
+        if self.solve():
+            self.display_board()
+
+    # Function to display a solved board
+    def display_board(self):
+        for i in range(9):
+            for j in range(9):
+                self.entries[i][j].delete(0, self.tk.END)
+                self.entries[i][j].insert(self.tk.END, str(self.board[i][j]))
+        self.root.update_idletasks()
 
     def solve(self):
+        if self.show:
+            self.display_board()
         find = self.find_empty()
         if not find:
             return True
@@ -58,11 +97,17 @@ class SudokuSolver:
         return True
 
     def find_empty(self):
-        for i in range(9):
-            for j in range(9):
-                if self.board[i][j] == 0:
-                    return (i, j) 
-        return None
+        empty_cells = [(i, j) for i in range(9) for j in range(9) if self.board[i][j] == 0]
+        if not empty_cells:
+            return None
+        else:
+            # Choose the cell with the fewest remaining possible numbers
+            return min(empty_cells, key=lambda cell: len(self.possible_numbers(cell)))
+        
+    def possible_numbers(self, cell):
+        row, col = cell
+        used_numbers = {self.board[i][col] for i in range(9)} | {self.board[row][j] for j in range(9)} | {self.board[row//3*3 + i//3][col//3*3 + i%3] for i in range(9)}
+        return {i for i in range(1, 10)} - used_numbers
 
     def get_vertical(self, col):
         vertical = [self.board[i][col] for i in range(9)]
