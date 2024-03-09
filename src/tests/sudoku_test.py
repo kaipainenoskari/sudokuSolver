@@ -15,8 +15,7 @@ class TestSolver(unittest.TestCase):
     def test_speed(self):
         execution_times = []
         for board in self.boards:
-            solver = SudokuSolver(test=True)
-            solver.board = board
+            solver = SudokuSolver(test=True, board=board)
             start_time = time.time()
             solver.solve()
             end_time = time.time()
