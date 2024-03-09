@@ -55,10 +55,11 @@ class GUI:
         value = entry_var.get()
         if not value.isdigit() or not 1 <= int(value) <= 9:
             entry_var.set("")
+            self.entries[row][col].config(bg='lightblue')  # Make the cell empty and the cell blue if the input is invalid
         elif self.update_board() and not self.parent.valid(int(value), (row, col)):
             self.entries[row][col].config(bg='red')  # Make the cell red if the move is not valid
         else:
-            self.entries[row][col].config(bg='lightblue')  # Make the cell white if the move is valid
+            self.entries[row][col].config(bg='lightblue')  # Make the cell blue if the move is valid
 
     def update_board(self):
         self.parent.board = self.get_board()
@@ -71,7 +72,6 @@ class GUI:
     # Function to solve the board
     def solve_board(self):
         self.parent.board = self.get_board()
-        self.parent.update_possible_values()
         self.solving = True
         if self.parent.solve():
             self.display_board()

@@ -7,16 +7,13 @@ class SudokuSolver:
     def __init__(self, io=sudokuSolver_io, gui=False, show=False, test=False, board=None):
         self.io = io
         self.show = show
-        self.possible_values = [[set(range(1, 10)) for _ in range(9)] for _ in range(9)]
         if gui:
             parent = self
             self.GUI = GUI(parent)
         elif not test:
             self.board = self.create_board()
-            self.update_possible_values()
         elif board:
             self.board = board
-            self.update_possible_values()
 
     def create_board(self):
         # Example board
@@ -28,16 +25,6 @@ class SudokuSolver:
             board.append(row)
         return board
 
-    def update_possible_values(self):
-        for i in range(9):
-            for j in range(9):
-                if self.board[i][j] != 0:
-                    self.possible_values[i][j] = set()
-                    continue
-                for num in range(1, 10):
-                    if not self.valid(num, (i, j)):
-                        self.possible_values[i][j].discard(num)
-
     def solve(self):
         if self.show:
             self.GUI.display_board()
@@ -46,14 +33,12 @@ class SudokuSolver:
             return True
         else:
             row, col = find
-        for num in sorted(self.possible_values[row][col], key=lambda x: len(self.possible_values[row][col])):
+        for num in self.possible_numbers((row, col)):
             if self.valid(num, (row, col)):
                 self.board[row][col] = num
-                self.update_possible_values()
                 if self.solve():
                     return True
                 self.board[row][col] = 0
-                self.update_possible_values()
         return False
     
     def print_board(self):
@@ -86,7 +71,12 @@ class SudokuSolver:
             return None
         else:
             # Choose the cell with the fewest remaining possible numbers
-            return min(empty_cells, key=lambda cell: len(self.possible_values[cell[0]][cell[1]]))
+            return min(empty_cells, key=lambda cell: len(self.possible_numbers(cell)))
+        
+    def possible_numbers(self, cell):
+        row, col = cell
+        used_numbers = {self.board[i][col] for i in range(9)} | {self.board[row][j] for j in range(9)} | {self.board[row//3*3 + i//3][col//3*3 + i%3] for i in range(9)}
+        return {i for i in range(1, 10)} - used_numbers
 
     def get_vertical(self, row, col):
         vertical = [self.board[i][col] for i in range(9) if i != row]

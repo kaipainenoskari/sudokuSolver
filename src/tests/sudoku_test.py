@@ -17,14 +17,16 @@ class TestSolver(unittest.TestCase):
         for board in self.boards:
             solver = SudokuSolver(test=True, board=board)
             start_time = time.time()
-            solver.solve()
-            end_time = time.time()
-            execution_time = end_time - start_time
+            if solver.solve():
+                end_time = time.time()
+                execution_time = end_time - start_time
 
-            # assert the solver finishes within 5 seconds
-            self.assertTrue(execution_time < 5)
+                # assert the solver finishes within 5 seconds
+                self.assertTrue(execution_time < 5)
 
-            execution_times.append(execution_time)
+                execution_times.append(execution_time)
+            else:
+                self.fail('Solver failed to solve board')
 
         # write sum of execution times and individual execution times to a file
         with open('execution_times.txt', 'a') as f:
