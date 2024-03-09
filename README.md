@@ -28,12 +28,6 @@ To use the Sudoku Solver, you need to have Python installed on your system. You 
     cd sudokuSolver/src
     ```
 
-3. Install the required dependencies:
-
-    ```bash
-    pip install -r requirements.txt
-    ```
-
 ## Usage
 
 To solve a Sudoku puzzle, run either of the following commands:
@@ -45,4 +39,10 @@ python main.py
 Graphical UI
 ```bash
 python mainGUI.py
+```
+
+To test the speed of the algorithm and to save the results make sure you're in the project root and run:
+
+```bash
+python -m unittest discover -s src -p '*_test.py'
 ```
