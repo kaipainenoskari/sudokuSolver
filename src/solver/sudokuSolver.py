@@ -70,15 +70,13 @@ class SudokuSolver:
 
     def valid(self, num, pos):
         # Check row
-        if num in self.get_vertical(pos[1]):
+        if num in self.get_vertical(pos[0], pos[1]):
             return False
         # Check column
-        if num in self.get_horizontal(pos[0]):
+        if num in self.get_horizontal(pos[0], pos[1]):
             return False
         # Check box
-        box_row = pos[0] // 3
-        box_col = pos[1] // 3
-        if num in self.get_box(box_row * 3, box_col * 3):
+        if num in self.get_box(pos[0], pos[1]):
             return False
         return True
 
@@ -90,17 +88,21 @@ class SudokuSolver:
             # Choose the cell with the fewest remaining possible numbers
             return min(empty_cells, key=lambda cell: len(self.possible_values[cell[0]][cell[1]]))
 
-    def get_vertical(self, col):
-        vertical = [self.board[i][col] for i in range(9)]
+    def get_vertical(self, row, col):
+        vertical = [self.board[i][col] for i in range(9) if i != row]
         return vertical
 
-    def get_horizontal(self, row):
-        horizontal = self.board[row]
+    def get_horizontal(self, row, col):
+        horizontal = self.board[row][:]
+        horizontal.pop(col)
         return horizontal
 
     def get_box(self, row, col):
+        box_row = (row // 3) * 3
+        box_col = (col // 3) * 3
         box = []
         for i in range(3):
             for j in range(3):
-                box.append(self.board[i + row][j + col])
+                if not (i + box_row == row and j + box_col == col):
+                    box.append(self.board[i + box_row][j + box_col])
         return box

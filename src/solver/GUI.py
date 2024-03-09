@@ -4,6 +4,7 @@ class GUI:
     def __init__(self, parent):
         self.tk = tk
         self.parent = parent
+        self.solving = False
         self.create_board_with_gui()
 
     def create_board_with_gui(self):
@@ -21,7 +22,7 @@ class GUI:
                     for cell_col in range(3):
                         i, j = box_row * 3 + cell_row, box_col * 3 + cell_col
                         entry_var = self.tk.StringVar()
-                        entry_var.trace("w", lambda name, index, mode, sv=entry_var: self.validate_entry(sv))
+                        entry_var.trace("w", lambda name, index, mode, sv=entry_var, row=i, col=j: self.validate_entry(sv, row, col))
                         entry = self.tk.Entry(box, textvariable=entry_var, width=2, font=('Arial', 42), justify='center')
                         entry.grid(row=cell_row, column=cell_col, padx=1, pady=1)
                         entry.bind('<FocusIn>', lambda event, row=i, col=j: self.highlight_cells(row, col))
@@ -35,19 +36,33 @@ class GUI:
         # Reset all cells to white
         for i in range(9):
             for j in range(9):
-                self.entries[i][j].config(bg='white')
+                if self.entries[i][j].cget('bg') != 'red':
+                    self.entries[i][j].config(bg='white')
 
         # Highlight the row, column, and box of the selected cell
         box_start_row, box_start_col = row - row % 3, col - col % 3
         for i in range(9):
-            self.entries[row][i].config(bg='lightblue')  # Highlight row
-            self.entries[i][col].config(bg='lightblue')  # Highlight column
-            self.entries[box_start_row + i // 3][box_start_col + i % 3].config(bg='lightblue')  # Highlight box
+            if self.entries[row][i].cget('bg') != 'red':
+                self.entries[row][i].config(bg='lightblue')  # Highlight row
+            if self.entries[i][col].cget('bg') != 'red':
+                self.entries[i][col].config(bg='lightblue')  # Highlight column
+            if self.entries[box_start_row + i // 3][box_start_col + i % 3].cget('bg') != 'red':
+                self.entries[box_start_row + i // 3][box_start_col + i % 3].config(bg='lightblue')  # Highlight box
 
-    def validate_entry(self, entry_var):
+    def validate_entry(self, entry_var, row, col):
+        if self.solving:
+            return
         value = entry_var.get()
         if not value.isdigit() or not 1 <= int(value) <= 9:
             entry_var.set("")
+        elif self.update_board() and not self.parent.valid(int(value), (row, col)):
+            self.entries[row][col].config(bg='red')  # Make the cell red if the move is not valid
+        else:
+            self.entries[row][col].config(bg='lightblue')  # Make the cell white if the move is valid
+
+    def update_board(self):
+        self.parent.board = self.get_board()
+        return True
 
     # Function to collect the current state of the board
     def get_board(self):
@@ -57,6 +72,7 @@ class GUI:
     def solve_board(self):
         self.parent.board = self.get_board()
         self.parent.update_possible_values()
+        self.solving = True
         if self.parent.solve():
             self.display_board()
 
@@ -65,5 +81,5 @@ class GUI:
         for i in range(9):
             for j in range(9):
                 self.entries[i][j].delete(0, self.tk.END)
-                self.entries[i][j].insert(self.tk.END, str(self.parent.board[i][j]))
+                self.entries[i][j].insert(self.tk.END, self.parent.board[i][j])
         self.root.update_idletasks()
