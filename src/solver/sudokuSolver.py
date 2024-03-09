@@ -3,13 +3,13 @@ from solver.sudokuSolver_io import sudokuSolver_io
 # Description: This file contains the code for the sudoku solver. It uses a backtracking algorithm to solve the puzzle.
 class SudokuSolver:
 
-    def __init__(self, io=sudokuSolver_io, gui=False, tk=None, show=False):
+    def __init__(self, io=sudokuSolver_io, gui=False, tk=None, show=False, test=False):
         self.io = io
-        if gui:
+        self.show = show
+        if gui and not test:
             self.tk = tk
-            self.show = show
             self.create_board_with_gui()
-        else:
+        elif not test:
             self.board = self.create_board()
 
     def create_board(self):
