@@ -69,12 +69,22 @@ class GUI:
     def get_board(self):
         return [[int(self.entries[i][j].get()) if self.entries[i][j].get() != "" else 0 for j in range(9)] for i in range(9)]
     
+    # Function to check if the board is valid (no red cells)
+    def check_board(self):
+        for i in range(9):
+            for j in range(9):
+                if self.entries[i][j].cget('bg') == 'red':
+                    return False
+        return True
+
     # Function to solve the board
     def solve_board(self):
         self.parent.board = self.get_board()
-        self.solving = True
-        if self.parent.solve():
-            self.display_board()
+        if self.check_board():
+            self.solving = True
+            if self.parent.solve():
+                self.display_board()
+        
 
     # Function to display a solved board
     def display_board(self):
