@@ -1,20 +1,22 @@
 from solver.sudokuSolver_io import sudokuSolver_io
+from solver.GUI import GUI
 
 # Description: This file contains the code for the sudoku solver. It uses a backtracking algorithm to solve the puzzle.
 class SudokuSolver:
 
-    def __init__(self, io=sudokuSolver_io, gui=False, tk=None, show=False, test=False, board=None):
+    def __init__(self, io=sudokuSolver_io, gui=False, show=False, test=False, board=None):
         self.io = io
         self.show = show
         self.possible_values = [[set(range(1, 10)) for _ in range(9)] for _ in range(9)]
         if gui:
-            self.tk = tk
-            self.create_board_with_gui()
+            parent = self
+            self.GUI = GUI(parent)
         elif not test:
             self.board = self.create_board()
+            self.update_possible_values()
         elif board:
             self.board = board
-        self.update_possible_values()
+            self.update_possible_values()
 
     def create_board(self):
         # Example board
@@ -25,20 +27,6 @@ class SudokuSolver:
             row = list(map(int, self.io.read(f"Enter row {i + 1}: ")))
             board.append(row)
         return board
-    
-    def create_board_with_gui(self):
-        # Create the main window
-        self.root = self.tk.Tk()
-
-        # Create a 9x9 grid of Entry widgets for input
-        self.entries = [[self.tk.Entry(self.root, width=2) for j in range(9)] for i in range(9)]
-        for i in range(9):
-            for j in range(9):
-                self.entries[i][j].grid(row=i, column=j)
-        
-        # Button to solve the board
-        solve_button = self.tk.Button(self.root, text="Solve", command=self.solve_board)
-        solve_button.grid(row=9, column=0, columnspan=9)
 
     def update_possible_values(self):
         for i in range(9):
@@ -50,28 +38,9 @@ class SudokuSolver:
                     if not self.valid(num, (i, j)):
                         self.possible_values[i][j].discard(num)
 
-
-    # Function to collect the current state of the board
-    def get_board(self):
-        return [[int(self.entries[i][j].get()) if self.entries[i][j].get() != "" else 0 for j in range(9)] for i in range(9)]
-    
-    # Function to solve the board
-    def solve_board(self):
-        self.board = self.get_board()
-        if self.solve():
-            self.display_board()
-
-    # Function to display a solved board
-    def display_board(self):
-        for i in range(9):
-            for j in range(9):
-                self.entries[i][j].delete(0, self.tk.END)
-                self.entries[i][j].insert(self.tk.END, str(self.board[i][j]))
-        self.root.update_idletasks()
-
     def solve(self):
         if self.show:
-            self.display_board()
+            self.GUI.display_board()
         find = self.find_empty()
         if not find:
             return True
