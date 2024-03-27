@@ -4,16 +4,17 @@ from solver.GUI import GUI
 # Description: This file contains the code for the sudoku solver. It uses a backtracking algorithm to solve the puzzle.
 class SudokuSolver:
 
-    def __init__(self, io=sudokuSolver_io, gui=False, show=False, test=False, board=None):
+    def __init__(self, io=sudokuSolver_io, gui=False, show=False, test=False, board=None, browser=None):
         self.io = io
         self.show = show
         if gui:
             parent = self
             self.GUI = GUI(parent)
-        elif not test:
+        elif not test and not board:
             self.board = self.create_board()
         elif board:
             self.board = board
+            self.browser = browser
 
     def create_board(self):
         # Example board
@@ -39,6 +40,27 @@ class SudokuSolver:
                 if self.solve():
                     return True
                 self.board[row][col] = 0
+        return False
+    
+    def solve_with_robot(self):
+        find = self.find_empty()
+        last_clicked = -1
+        if not find:
+            return True
+        else:
+            row, col = find
+        for num in self.possible_numbers((row, col)):
+            if self.valid(num, (row, col)):
+                self.board[row][col] = num
+                if last_clicked != (row * 9) + col:
+                    self.browser.page().click(f'//div[@data-cell="{(row * 9) + col}"]')
+                self.browser.page().keyboard.type(str(num))
+                if self.solve_with_robot():
+                    return True
+                self.board[row][col] = 0
+                self.browser.page().click(f'//div[@data-cell="{(row * 9) + col}"]')
+                last_clicked = (row * 9) + col
+                self.browser.page().keyboard.press('Backspace')
         return False
     
     def print_board(self):

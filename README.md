@@ -40,6 +40,10 @@ Graphical UI
 ```bash
 python mainGUI.py
 ```
+Automatic Sudoku solving
+```bash
+python robotSolver.py
+```
 
 To test the speed of the algorithm and to save the results make sure you're in the project root and run:
 
